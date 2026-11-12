@@ -1,0 +1,11 @@
+{
+  "package": "magpie-freepi",
+  "name": "magpie-FreePI",
+  "providers": [
+    "freepi"
+  ],
+  "summary": {
+    "en": "magpie-FreePI: brings free-pi (freepi.ai) free model pool into magpie, with automatic ad keep-alive and no Python proxy.",
+    "zh": "magpie-FreePI：把 free-pi（freepi.ai）的免费模型池接进 magpie，自动看广告保活，不再需要 Python 反代。"
+  }
+}
