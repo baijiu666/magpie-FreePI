@@ -14,10 +14,10 @@ import { catalogName, createCatalogReader, entryFromCatalog, modelsFromCatalog }
 
 const FREE_IDS = ["deepseek-v4.1-flash", "deepseek-v4-flash", "glm-5.3-flash", "particle"]
 
-test("静态兜底表与 /client-version 的可用模型一致（17 条）", () => {
+test("静态兜底表与 /client-version 的可用模型一致（18 条）", () => {
   const config = modelsForConfig()
   const provider = modelsForProvider()
-  assert.equal(Object.keys(config).length, 17)
+  assert.equal(Object.keys(config).length, 18)
   assert.equal(Object.keys(config).length, MODEL_DEFS.length)
   assert.deepEqual(Object.keys(provider).sort(), Object.keys(config).sort())
   assert.equal(new Set(MODEL_DEFS.map((d) => d.id)).size, MODEL_DEFS.length, "id 不能重复")
@@ -70,23 +70,25 @@ test("默认模型与倍率抽查", () => {
   // CLI 的默认是 models[0]（catalog 第一条 main = particle）
   assert.equal(m["particle"].default, true)
   assert.equal(m["deepseek-v4.1-flash"].default, undefined)
-  assert.equal(m["solar-pro-4"].rate, "x0.6")
-  assert.equal(m["mimo-v2.6-flash"].rate, "x2.8")
-  assert.equal(m["deepseek-v4-pro"].rate, "x18")
-  assert.equal(m["kimi-k3.1-pro"].rate, "x41")
-  assert.match(m["kimi-k3.1-pro"].name, /daily limit/u)
+  assert.equal(m["hy4-flash"].rate, "x0.2")
+  assert.equal(m["solar-pro-4"].rate, "x1.2")
+  assert.equal(m["mimo-v2.6-flash"].rate, "x0.8")
+  assert.equal(m["qwen3.5-35b-darkbloom"].rate, "x2.1")
+  assert.equal(m["deepseek-v4-pro"].rate, "x5.9")
+  assert.equal(m["kimi-k3.1-pro"].rate, "x22")
+  assert.match(m["kimi-k3.1-pro"].name, /premium credits/u)
   assert.match(m["abliterated-large-v2"].name, /Defense/u)
   assert.equal(m["abliterated-large-v2"].rate, "x60")
-  assert.equal(m["deepseek-v4.1-flash-1017-ultrafast"].rate, "x295")
+  assert.equal(m["deepseek-v4.1-flash-1017-ultrafast"].rate, "x1.6")
 })
 
 test("目录条目：free/usage_x/section/note/unavailable 的映射", () => {
   const catalog = {
     models: [
       { id: "particle", name: "Particle · 🔥 Free Unlimited: limited time", display_name: "Particle", free: true, usage_x: null },
-      { id: "deepseek-v4.1-flash-1017-ultrafast", display_name: "DeepSeek V4.1 Flash Ultrafast 🔥🔥🔥", free: false, usage_x: "295" },
+      { id: "deepseek-v4.1-flash-1017-ultrafast", display_name: "DeepSeek V4.1 Flash 600tps", free: false, usage_x: "1.6" },
       { id: "uncensored-1.2", display_name: "Uncensored 1.2", free: false, usage_x: "20", section: "defense", note: null },
-      { id: "kimi-k3.1-pro", display_name: "Kimi K3.1 Pro", free: false, usage_x: "41", note: "daily limit" },
+      { id: "kimi-k3.1-pro", display_name: "Kimi K3.1 Pro", free: false, usage_x: "22", note: "premium credits" },
       { id: "gemini-4-argon", display_name: "Gemini 4 Argon", free: false, usage_x: null, unavailable: true },
     ],
   }
@@ -94,11 +96,11 @@ test("目录条目：free/usage_x/section/note/unavailable 的映射", () => {
   assert.equal(Object.keys(models).length, 4, "unavailable 的不列")
   assert.equal(models.particle.free, true)
   assert.equal(models.particle.default, true)
-  assert.equal(models["deepseek-v4.1-flash-1017-ultrafast"].name, "DeepSeek V4.1 Flash Ultrafast")
-  assert.equal(models["deepseek-v4.1-flash-1017-ultrafast"].rate, "x295")
+  assert.equal(models["deepseek-v4.1-flash-1017-ultrafast"].name, "DeepSeek V4.1 Flash 600tps")
+  assert.equal(models["deepseek-v4.1-flash-1017-ultrafast"].rate, "x1.6")
   assert.equal(models["uncensored-1.2"].name, "Uncensored 1.2 · Defense")
-  assert.equal(models["kimi-k3.1-pro"].name, "Kimi K3.1 Pro · daily limit")
-  assert.equal(models["kimi-k3.1-pro"].rate, "x41")
+  assert.equal(models["kimi-k3.1-pro"].name, "Kimi K3.1 Pro · premium credits")
+  assert.equal(models["kimi-k3.1-pro"].rate, "x22")
   assert.equal(entryFromCatalog(null), null)
 
   // 不传 defaultId 时按 CLI 的 models[0] 自动选第一条 main（particle）
@@ -117,8 +119,8 @@ test("catalogName 清理官方 name 里的用量后缀", () => {
     "Solar Pro 4",
   )
   assert.equal(
-    catalogName({ display_name: "Kimi K3.1 Pro", note: "daily limit" }),
-    "Kimi K3.1 Pro · daily limit",
+    catalogName({ display_name: "Kimi K3.1 Pro", note: "premium credits" }),
+    "Kimi K3.1 Pro · premium credits",
   )
 })
 

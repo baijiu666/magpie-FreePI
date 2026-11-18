@@ -4,7 +4,7 @@
 //   { min, latest, model, models: [{ id, name, display_name, free, usage_x,
 //     section?, note?, unavailable?, stats_id? }], fusion, experiments }
 //
-// 这是 free-pi-cli 0.6.19 真正用的目录（不是 freepi.ai/models 的网页表）。
+// 这是 free-pi-cli 0.6.23 真正用的目录（不是 freepi.ai/models 的网页表）。
 // 插件用它替换静态兜底；拉不到时才回退 MODEL_DEFS。
 
 import { modelEntry } from "./provider.mjs"

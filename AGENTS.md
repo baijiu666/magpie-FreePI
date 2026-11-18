@@ -31,7 +31,7 @@ npm run probe     # 真机探测（花少量额度）
 6. **模型表来自官方 CLI 的 `/client-version`**：`src/catalog.mjs` 调
    `GET /client-version`，按 `free` / `usage_x` / `section` / `note` 生成条目，
    过滤 `unavailable: true`（当前是 2 个 Gemini）。拉不到才回退
-   `src/provider.mjs` 的 `MODEL_DEFS`（17 个可用模型）。上下文/输出/reasoning/工具/成本
+   `src/provider.mjs` 的 `MODEL_DEFS`（18 个可用模型）。上下文/输出/reasoning/工具/成本
    按 CLI：**context 200000 / output 8192 / reasoning=true / 工具由 agent 提供 / cost 0**。
    **输入模态不照抄 CLI 的 text**（它走自己的 vision 工具）：`MODEL_INPUTS` 里 4 个模型
    支持图片/视频/音频，其余 text-only。`free` 只给目录里 `free: true` 的 4 个，其余用
@@ -51,7 +51,7 @@ npm run probe     # 真机探测（花少量额度）
 | `src/usage.mjs` | `/me` → 额度窗口 |
 | `src/errors.mjs` | 错误码与 OpenAI 形状错误体 |
 
-## 官方 CLI（free-pi-cli 0.6.19）逆向要点
+## 官方 CLI（free-pi-cli 0.6.23）逆向要点
 
 - 模型目录：`GET /client-version`（Bearer 可选，头 `x-freepi-cost-exp: 1`）→ `models[]`，每项
   `{id, name, display_name, free, usage_x, section?, note?, unavailable?, stats_id?}`；
@@ -59,10 +59,12 @@ npm run probe     # 真机探测（花少量额度）
 - 默认模型：CLI 用 `models[0].id`（当前目录第一条 main 是 `particle`）；插件同样按
   目录第一条 main 标 `default`，静态兜底也把 `particle` 放第一。
 - provider 配置：`baseUrl = api.freepi.ai/v1`，请求头 `x-session-id` +
-  `x-client-version`，模型统一 `contextWindow=200000`、`maxTokens=8192`、
+  `x-client-version`（0.6.23；服务端最低 0.6.21）、`x-ad-context: none`，模型统一 `contextWindow=200000`、`maxTokens=8192`、
   `input=["text"]`、`reasoning=true`、`cost=0`。⚠ 这是 CLI 的 agent 配置；Magpie 直接
   透传图片，所以插件按 `MODEL_INPUTS` 给 4 个模型标了图片/视频/音频。
 - `/model_requires_credits`（young 账号用 Kimi）：映射 429，让宿主换 established 账号。
+- 2026-11-18 目录：18 个可用模型，新增 `hy4-flash`（x0.2）；Kimi 变 `premium credits`（x22），
+  ultrafast 变 `DeepSeek V4.1 Flash 600tps`（x1.6）。
 - 每个对话请求还会带 `x-turn-id`（turn UUID）；广告 `/ads/next` 带
   `x-turn-id` + `x-client-os/arch/timezone/locale`，`/ads/impression` 带 `x-session-id`。
 - Gravity 广告：先 GET `imp_url`（只允许 `https://*.trygravity.ai|com`），

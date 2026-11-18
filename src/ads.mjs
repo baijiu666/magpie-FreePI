@@ -1,6 +1,6 @@
 // src/ads.mjs —— 按官方 CLI 的节奏取广告（不是定时器）。
 //
-// free-pi-cli 0.6.19 的真实行为（pi-ads）：
+// free-pi-cli 0.6.23 的真实行为（pi-ads）：
 //   · session start / 每个新用户消息 → 取一条 banner 广告并上报 impression；
 //   · 每 5 个 turn（默认 AD_INLINE_TURN_FREQUENCY=5）→ 取一条 inline 广告；
 //   · banner 是 Gravity 时跳过 inline（同一轮只展示一个第三方广告）；

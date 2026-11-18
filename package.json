@@ -1,6 +1,6 @@
 {
   "name": "magpie-freepi",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "magpie-FreePI：把 free-pi（freepi.ai）的免费模型池接进 magpie：自动看广告保活、流式透传、不再需要 Python 反代。",
   "type": "module",
   "main": "./index.mjs",

@@ -24,7 +24,7 @@ import { createUsageReader } from "./src/usage.mjs"
 import { createCatalogReader } from "./src/catalog.mjs"
 import { createRelay } from "./src/relay.mjs"
 
-const VERSION = "0.1.7"
+const VERSION = "0.1.8"
 
 function errorText(error) {
   return String(error?.message ?? error ?? "登录失败")

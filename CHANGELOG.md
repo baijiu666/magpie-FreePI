@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.1.8 — 2026-11-18
+
+- 修复上游 426 `free_pi_error`：服务端要求 `free-pi-cli >= 0.6.21`，插件原来发 0.6.19。
+  现在按官方 npm 最新 **0.6.23** 发 `x-client-version`。
+- chat 头补上 0.6.23 的 `x-ad-context: none`（无广告上下文时显式 opt-out）。
+- 静态兜底目录刷新到 2026-11-18 的 18 个模型：新增 `hy4-flash`（x0.2）；
+  `deepseek-v4-pro` x5.9、`kimi-k3.1-pro` x22 / premium credits、`solar-pro-4` x1.2、
+  `mimo-v2.6-flash` x0.8、`qwen3.5-35b-darkbloom` x2.1、`qwen3.6-plus-uncensored` x37、
+  `deepseek-v4.1-flash-1017-ultrafast` x1.6 / 600tps。
+- 测试 59 个。
+
 ## 0.1.7 — 2026-11-12
 
 - 恢复多模态输入：`deepseek-v4.1-flash`（文本/图片）、`glm-5.3-flash`（文本/图片/视频）、

@@ -45,7 +45,7 @@ test("config 钩子提供 provider 与完整静态模型表；用户已配置时
   assert.equal(provider.npm, "@ai-sdk/openai-compatible")
   assert.equal(provider.api, "https://api.freepi.ai/v1")
   assert.equal(provider.searches, false)
-  assert.equal(Object.keys(provider.models).length, 17)
+  assert.equal(Object.keys(provider.models).length, 18)
 
   const custom = { provider: { freepi: { name: "自定义", models: { x: { id: "x" } } } } }
   await plugin.config(custom)
@@ -86,8 +86,9 @@ test("loader 返回 baseURL / fetch，并给上游带 Bearer token", async () =>
   assert.equal(chatCall.init.headers.get("accept"), "text/event-stream")
   // 官方 CLI 的 provider headers
   assert.match(chatCall.init.headers.get("x-session-id"), /^magpie-/u)
-  assert.equal(chatCall.init.headers.get("x-client-version"), "0.6.19")
+  assert.equal(chatCall.init.headers.get("x-client-version"), "0.6.23")
   assert.match(chatCall.init.headers.get("x-turn-id"), /^[0-9a-f-]{36}$/u)
+  assert.equal(chatCall.init.headers.get("x-ad-context"), "none")
 })
 
 test("usage 钩子从 /me 算出已用百分比", async () => {
@@ -149,7 +150,7 @@ test("粘贴 token 登录：callback 验证后返回 success", async () => {
 test("provider.models 无登录时返回静态兜底目录", async () => {
   const plugin = await mod.FreePiPlugin({}, { fetch: fetchMock().impl })
   const models = await plugin.provider.models(undefined, {})
-  assert.equal(Object.keys(models).length, 17)
+  assert.equal(Object.keys(models).length, 18)
   assert.equal(models["deepseek-v4.1-flash"].free, true)
   assert.deepEqual(models["deepseek-v4.1-flash"].limit, { context: 200000, output: 8192 })
 })
@@ -157,11 +158,11 @@ test("provider.models 无登录时返回静态兜底目录", async () => {
 test("provider.models 有登录时使用 /client-version 的动态目录", async () => {
   const mock = fetchMock({
     "https://api.freepi.ai/client-version": () => json({
-      min: "0.6.19",
-      latest: "0.6.19",
+      min: "0.6.21",
+      latest: "0.6.22",
       models: [
         { id: "deepseek-v4.1-flash", display_name: "DeepSeek V4.1 Flash", free: true },
-        { id: "kimi-k3.1-pro", display_name: "Kimi K3.1 Pro", free: false, usage_x: "41", note: "daily limit" },
+        { id: "kimi-k3.1-pro", display_name: "Kimi K3.1 Pro", free: false, usage_x: "22", note: "premium credits" },
         { id: "gemini-4-argon", display_name: "Gemini 4 Argon", unavailable: true },
       ],
     }),
@@ -171,6 +172,6 @@ test("provider.models 有登录时使用 /client-version 的动态目录", async
 
   assert.deepEqual(Object.keys(models).sort(), ["deepseek-v4.1-flash", "kimi-k3.1-pro"])
   assert.equal(models["deepseek-v4.1-flash"].free, true)
-  assert.equal(models["kimi-k3.1-pro"].rate, "x41")
-  assert.match(models["kimi-k3.1-pro"].name, /daily limit/u)
+  assert.equal(models["kimi-k3.1-pro"].rate, "x22")
+  assert.match(models["kimi-k3.1-pro"].name, /premium credits/u)
 })

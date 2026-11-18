@@ -68,7 +68,7 @@ test("/models 由插件自己回答，不打上游", async () => {
   assert.equal(res.status, 200)
   const body = await res.json()
   assert.equal(body.object, "list")
-  assert.equal(body.data.length, 17)
+  assert.equal(body.data.length, 18)
   assert.equal(client.chatCalls.length, 0)
 })
 

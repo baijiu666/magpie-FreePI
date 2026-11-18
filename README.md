@@ -37,9 +37,9 @@ token 是 90 天 JWT；**上游没有续期端点**，过期后重新登录即�
 
 ## 模型
 
-模型表不是写死的：`provider.models` 调用官方 CLI 的 `GET /client-version`（0.6.19）
+模型表不是写死的：`provider.models` 调用官方 CLI 的 `GET /client-version`（0.6.23）
 拿目录，按官方字段 `free` / `usage_x` / `section` / `note` 生成；拉不到才回退
-`src/provider.mjs` 的 `MODEL_DEFS`（与 2026-11-12 的目录一致，17 个可用模型）。
+`src/provider.mjs` 的 `MODEL_DEFS`（与 2026-11-18 的目录一致，18 个可用模型）。
 
 官方 CLI 的 provider 配置对所有模型一视同仁：
 
@@ -58,19 +58,20 @@ token 是 90 天 JWT；**上游没有续期端点**，过期后重新登录即�
 | `deepseek-v4.1-flash` | 免费无限 | 文本 / 图片 | |
 | `deepseek-v4-flash` | 免费无限 | 文本 | |
 | `glm-5.3-flash` | 免费无限 | 文本 / 图片 / 视频 | |
-| `solar-pro-4` | x0.6 | 文本 | |
-| `mimo-v2.6-flash` | x2.8 | 文本 / 图片 / 音频 / 视频 | |
-| `qwen3.5-35b-darkbloom` | x2.9 | 文本 | |
-| `deepseek-v4-pro` | x18 | 文本 | |
+| `hy4-flash` | x0.2 | 文本 | |
+| `solar-pro-4` | x1.2 | 文本 | |
+| `mimo-v2.6-flash` | x0.8 | 文本 / 图片 / 音频 / 视频 | |
+| `qwen3.5-35b-darkbloom` | x2.1 | 文本 | |
+| `deepseek-v4-pro` | x5.9 | 文本 | |
 | `abliterated-large-flash` | x20 | 文本 | Defense |
 | `deepseek-v4.1-flash-abliterated` | x20 | 文本 | Defense |
 | `gemma-4-uncensored` | x20 | 文本 | Defense |
 | `glm-4.7-flash-heretic` | x20 | 文本 | Defense |
-| `qwen3.6-plus-uncensored` | x20 | 文本 | Defense |
+| `qwen3.6-plus-uncensored` | x37 | 文本 | Defense |
 | `uncensored-1.2` | x20 | 文本 | Defense |
-| `kimi-k3.1-pro` | x41 | 文本 / 图片 / 视频 | daily limit |
+| `kimi-k3.1-pro` | x22 | 文本 / 图片 / 视频 | premium credits |
 | `abliterated-large-v2` | x60 | 文本 | Defense |
-| `deepseek-v4.1-flash-1017-ultrafast` | x295 | 文本 | |
+| `deepseek-v4.1-flash-1017-ultrafast` | x1.6 | 文本 | |
 
 ## 它替你做了什么
 
@@ -81,7 +82,7 @@ token 是 90 天 JWT；**上游没有续期端点**，过期后重新登录即�
 | 广告按 CLI 的 turn 节奏 | 启动/每个用户消息一条 banner；每 5 个用户轮次一条 inline；Gravity banner 跳过 inline |
 | Gravity 广告的 `imp_url` | 先 GET 一次外部曝光地址，再上报 `imp_fired: true`（与 CLI 一致） |
 | 官方模型目录 | `src/catalog.mjs` 调 `GET /client-version`，按 10 分钟缓存；失败回静态兜底 |
-| 官方 CLI 请求头 | chat 带 `x-session-id` / `x-client-version` / `x-turn-id`；广告带 `x-turn-id` |
+| 官方 CLI 请求头 | chat 带 `x-session-id` / `x-client-version` / `x-ad-context: none` / `x-turn-id`；广告带 `x-turn-id` |
 | 429 `concurrent` 自动换号 | magpie 自己的多账号路由；插件在同账号内短退避重试，仍失败就回 429 让宿主换号 |
 | 409 `concurrent_session` 释放会话 | `src/relay.mjs` 调 `/session/reset` 后重试 |
 | 402/403 `ads_required` 补刷广告 | 同步补刷一轮再重试 |
@@ -101,6 +102,7 @@ token 是 90 天 JWT；**上游没有续期端点**，过期后重新登录即�
 
 - **同一账号同时只能跑 1 个请求**（服务端硬限制）。要给多个 agent 并发，就在 magpie 里多登几个账号。
 - **上下文 200K / 输出 8K**（官方 CLI 的配置）；超长会拿到 `context_ceiling` / `context_too_long`。
+- 上游要求客户端版本 ≥ **0.6.21**；插件按官方 CLI **0.6.23** 发 `x-client-version`，低于 min 会返回 426 并提示 `npx free-pi-cli@latest`。
 - `kimi-k3.1-pro` 在 `young` 账号上会返回 `403 model_requires_credits`（需要购买 credits 或换
   `established` 账号）。插件把它映射成 429，让 Magpie 自动换一个有资格的账号。
 - **上下文缓存不可用**（`cached_tokens` 恒为 0），每轮全量重传历史。

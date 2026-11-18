@@ -102,6 +102,8 @@ export function createRelay({
     const headers = {
       "x-session-id": sessionId,
       "x-client-version": CLIENT_VERSION,
+      // 0.6.23 的 provider 配置在无广告上下文时显式 opt-out
+      "x-ad-context": "none",
       "x-turn-id": turnId || crypto?.randomUUID?.() || `turn-${Date.now()}`,
     }
     let last = null

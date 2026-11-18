@@ -18,10 +18,10 @@ export const BASE = `${ORIGIN}/v1`
 export const SDK = "@ai-sdk/openai-compatible"
 
 /**
- * 官方客户端版本。反代 0.6.19 实测可用；上游按它判断客户端能力，
- * 升级时先改这里再重新跑 scripts/probe-live.mjs。
+ * 官方客户端版本。上游现在要求最低 0.6.21（2026-11-18 实测）；
+ * 用 npm 最新 0.6.23。升级时先改这里再重新跑 scripts/probe-live.mjs。
  */
-export const CLIENT_VERSION = "0.6.19"
+export const CLIENT_VERSION = "0.6.23"
 
 /** /me 额度缓存：60 秒（反代同值）。 */
 export const ME_TTL_MS = 60_000
@@ -38,7 +38,7 @@ export const ICON =
   "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjggMTI4Ij48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM1YjhjZmYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiM3YzVjZmYiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgcng9IjI4IiBmaWxsPSJ1cmwoI2cpIi8+PHRleHQgeD0iNjQiIHk9Ijg5IiBmb250LWZhbWlseT0iR2VvcmdpYSwgJ1RpbWVzIE5ldyBSb21hbicsIHNlcmlmIiBmb250LXNpemU9IjcyIiBmb250LXdlaWdodD0iNzAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmIj4mIzk2MDs8L3RleHQ+PC9zdmc+"
 
 /**
- * 官方 free-pi-cli（0.6.19）的模型事实：
+ * 官方 free-pi-cli（0.6.23）的模型事实：
  *   · 目录来自 GET /client-version 的 `models`（动态，provider.models 会去拉）；
  *   · provider 配置固定 CONTEXT_WINDOW=200000、MAX_OUTPUT_TOKENS=8192；
  *   · reasoning=true，工具由 agent 统一提供，cost 全 0（真正的成本是 credits）。
@@ -46,9 +46,8 @@ export const ICON =
  *     把模型请求固定成 text；Magpie 是直接透传图片的，所以按实测/站点详情页标：
  *     deepseek-v4.1-flash / glm-5.3-flash / kimi-k3.1-pro / mimo-v2.6-flash 支持图片。
  *
- * 这份 MODEL_DEFS 是 /client-version 不可达时的静态兜底，内容与该接口 2026-11-12
- * 的可用模型一致（18 个里去掉 2 个 unavailable 的 Gemini）。
- * free=true 只给官方标 Free Unlimited 的 4 个；rate 是官方 usage_x。
+ * 这份 MODEL_DEFS 是 /client-version 不可达时的静态兜底，内容与该接口 2026-11-18
+ * 的可用模型一致（18 个）。free=true 只给 Free Unlimited 的 4 个；rate 是 usage_x。
  */
 export const CLI_CONTEXT_WINDOW = 200_000
 export const CLI_MAX_OUTPUT = 8_192
@@ -64,25 +63,26 @@ export const MODEL_INPUTS = Object.freeze({
 
 export const MODEL_DEFS = Object.freeze([
   // ── 免费无限（Free first 会优先派发；CLI 的默认是 models[0] = particle） ──
-  { id: "particle", name: "Particle", free: true, default: true },
+  { id: "particle", name: "Particle-1", free: true, default: true },
   { id: "deepseek-v4.1-flash", name: "DeepSeek V4.1 Flash", free: true },
   { id: "glm-5.3-flash", name: "GLM 5.3 Flash", free: true },
   { id: "deepseek-v4-flash", name: "DeepSeek V4 Flash", free: true },
+  { id: "hy4-flash", name: "Hy4 Flash", rate: "x0.2" },
 
   // ── 按用量计费（消耗今日积分；rate 是官方 usage_x） ───────────────
-  { id: "solar-pro-4", name: "Solar Pro 4", rate: "x0.6" },
-  { id: "mimo-v2.6-flash", name: "MiMo V2.6 Flash (Xiaomi)", rate: "x2.8" },
-  { id: "qwen3.5-35b-darkbloom", name: "Qwen3.5 35B (Darkbloom)", rate: "x2.9" },
-  { id: "deepseek-v4-pro", name: "DeepSeek V4 Pro", rate: "x18" },
+  { id: "solar-pro-4", name: "Solar Pro 4", rate: "x1.2" },
+  { id: "mimo-v2.6-flash", name: "MiMo V2.6 Flash (Xiaomi)", rate: "x0.8" },
+  { id: "qwen3.5-35b-darkbloom", name: "Qwen3.5 35B (Darkbloom)", rate: "x2.1" },
+  { id: "deepseek-v4-pro", name: "DeepSeek V4 Pro", rate: "x5.9" },
   { id: "abliterated-large-flash", name: "Abliterated Large Flash · Defense", rate: "x20" },
   { id: "deepseek-v4.1-flash-abliterated", name: "DeepSeek V4.1 Flash Abliterated · Defense", rate: "x20" },
   { id: "gemma-4-uncensored", name: "Gemma 4 Uncensored · Defense", rate: "x20" },
   { id: "glm-4.7-flash-heretic", name: "GLM 4.7 Flash Heretic · Defense", rate: "x20" },
-  { id: "qwen3.6-plus-uncensored", name: "Qwen 3.6 Plus Uncensored · Defense", rate: "x20" },
+  { id: "qwen3.6-plus-uncensored", name: "Qwen 3.6 Plus Uncensored · Defense", rate: "x37" },
   { id: "uncensored-1.2", name: "Uncensored 1.2 · Defense", rate: "x20" },
-  { id: "kimi-k3.1-pro", name: "Kimi K3.1 Pro · daily limit", rate: "x41" },
+  { id: "kimi-k3.1-pro", name: "Kimi K3.1 Pro · premium credits", rate: "x22" },
   { id: "abliterated-large-v2", name: "Abliterated Large V2 · Defense", rate: "x60" },
-  { id: "deepseek-v4.1-flash-1017-ultrafast", name: "DeepSeek V4.1 Flash Ultrafast", rate: "x295" },
+  { id: "deepseek-v4.1-flash-1017-ultrafast", name: "DeepSeek V4.1 Flash 600tps", rate: "x1.6" },
 ])
 
 /** 一条模型；上下文/输出/工具/推理按 CLI，输入模态按 MODEL_INPUTS。 */

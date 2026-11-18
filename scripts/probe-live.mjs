@@ -12,6 +12,7 @@ import fs from "node:fs"
 import { normalizeToken } from "../src/auth.mjs"
 import { createClient } from "../src/client.mjs"
 import { createAdKeeper } from "../src/ads.mjs"
+import { CLIENT_VERSION } from "../src/provider.mjs"
 
 function argOf(name) {
   const index = process.argv.indexOf(name)
@@ -49,12 +50,12 @@ console.log(`/me 200  handle=${profile.handle ?? "?"} tier=${profile.tier ?? "?"
 
 const keeper = createAdKeeper({ client })
 const ads = await keeper.force({ access: token, uid: profile.user_id })
-keeper.stop()
 console.log(`ads ${ads?.ok ? "ok" : "FAILED"}${ads?.error ? `：${ads.error}` : ""}`)
 
 const res = await client.chat({
   token,
   stream: false,
+  headers: { "x-client-version": CLIENT_VERSION, "x-ad-context": "none" },
   bodyText: JSON.stringify({
     model: "deepseek-v4.1-flash",
     messages: [{ role: "user", content: "Reply with the single word OK." }],
